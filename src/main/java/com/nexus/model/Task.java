@@ -10,17 +10,19 @@ public class Task {
 
     private static int nextId = 1;
 
+    private int estimatedEffort;
     private int id;
     private LocalDate deadline; // Imutável após o nascimento
     private String title;
     private TaskStatus status;
     private User owner;
 
-    public Task(String title, LocalDate deadline) {
+    public Task(String title, LocalDate deadline, int estimatedEffort) {
         this.id = nextId++;
         this.deadline = deadline;
         this.title = title;
         this.status = TaskStatus.TO_DO;
+        this.estimatedEffort = estimatedEffort;
         
         // Ação do Aluno:
         totalTasksCreated++; 
@@ -31,6 +33,14 @@ public class Task {
      * Regra: Só é possível se houver um owner atribuído e não estiver BLOCKED.
      */
     public void moveToInProgress(User user) {
+        if (this.status == TaskStatus.BLOCKED) {
+            throw new IllegalArgumentException("Status da tarefa: BLOCKED.");
+        }
+        if (this.owner == null) {
+            throw new IllegalArgumentException("Tarefa não possui owner.");
+        }
+        this.status = TaskStatus.IN_PROGRESS;
+        activeWorkload++;
         // TODO: Implementar lógica de proteção e atualizar activeWorkload
         // Se falhar, incrementar totalValidationErrors e lançar NexusValidationException
     }
@@ -39,7 +49,12 @@ public class Task {
      * Finaliza a tarefa.
      * Regra: Só pode ser movida para DONE se não estiver BLOCKED.
      */
-    public void markAsDone() {
+    public void markAsDone(User user) {
+        if (this.status == TaskStatus.BLOCKED) {
+            throw new IllegalArgumentException("Status da tarefa: BLOCKED.");
+        }
+        this.status = TaskStatus.DONE;
+        activeWorkload--;
         // TODO: Implementar lógica de proteção e atualizar activeWorkload (decrementar)
     }
 

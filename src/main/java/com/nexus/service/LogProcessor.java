@@ -30,13 +30,26 @@ public class LogProcessor {
                     try {
                         switch (action) {
                             case "CREATE_USER" -> {
-                                users.add(new User(p[1], p[2]));
-                                System.out.println("[LOG] Usuário criado: " + p[1]);
+                                User user = new User(p[1], p[2]);
+                                users.add(user);
+                                System.out.println("[LOG] Usuário criado: " + user.consultUsername());
+                            }
+                            case "CREATE_PROJECT" -> {
+
                             }
                             case "CREATE_TASK" -> {
-                                Task t = new Task(p[1], LocalDate.parse(p[2]));
+                                Task t = new Task(p[1], LocalDate.parse(p[2]), Integer.parseInt(p[3]));
                                 workspace.addTask(t);
                                 System.out.println("[LOG] Tarefa criada: " + p[1]);
+                            }
+                            case "ASSIGN_USER" -> {
+                                
+                            }
+                            case "CHANGE_STATUS" -> {
+                                
+                            }
+                            case "REPORT_STATUS" -> {
+                                
                             }
                             default -> System.err.println("[WARN] Ação desconhecida: " + action);
                         }
