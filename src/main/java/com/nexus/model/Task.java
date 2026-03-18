@@ -22,6 +22,9 @@ public class Task {
         this.deadline = deadline;
         this.title = title;
         this.status = TaskStatus.TO_DO;
+        if (estimatedEffort <= 0) {
+            throw new IllegalArgumentException("Esforço estimado (em horas) deve ser inteiro positivo.");
+    }
         this.estimatedEffort = estimatedEffort;
         
         // Ação do Aluno:
