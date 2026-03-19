@@ -27,9 +27,9 @@ public class Project {
         throw new IllegalArgumentException("Tarefa vazia.");
     }
     int currentEffort = taskList.stream()
-                    .mapToInt(Task::getEstimatedEffort)
+                    .mapToInt(Task::getEffort)
                     .sum();
-    int totalEffort = currentEffort + t.getEstimatedEffort();
+    int totalEffort = currentEffort + t.getEffort();
     if (totalEffort > totalBudget) {
         throw new IllegalArgumentException("Orçamento total (em horas) do Projeto foi excedido.");
     }

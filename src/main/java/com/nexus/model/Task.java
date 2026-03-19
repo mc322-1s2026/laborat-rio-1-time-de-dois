@@ -7,27 +7,36 @@ public class Task {
     public static int totalTasksCreated = 0;
     public static int totalValidationErrors = 0;
     public static int activeWorkload = 0;
-
     private static int nextId = 1;
 
-    private int estimatedEffort;
+    private int effort;
     private int id;
     private LocalDate deadline; // Imutável após o nascimento
     private String title;
     private TaskStatus status;
     private User owner;
+    
+    public Task(String title, LocalDate deadline, int effort, String projectName) {
+        if (title == null || title.isBlank()) {
+             throw new IllegalArgumentException("Título não pode ser vazio.");
+        }
+        if (effort <= 0) {
+            throw new IllegalArgumentException("Esforço estimado (em horas) deve ser inteiro positivo.");
+        }
 
-    public Task(String title, LocalDate deadline, int estimatedEffort) {
         this.id = nextId++;
         this.deadline = deadline;
-        this.title = title;
-        this.status = TaskStatus.TO_DO;
-        if (estimatedEffort <= 0) {
-            throw new IllegalArgumentException("Esforço estimado (em horas) deve ser inteiro positivo.");
-    }
-        this.estimatedEffort = estimatedEffort;
-        
-        // Ação do Aluno:
+        this.title = title.trim();
+        this.status = TaskStatus.TO_DO;        
+        this.effort = effort;
+
+        Project project = Project.findByName(projectName);
+        if (project != null) {
+            project.addTask(this);
+        } else {
+        throw new IllegalArgumentException("Projeto inexistente: " + projectName);
+        }
+
         totalTasksCreated++; 
     }
 
@@ -39,9 +48,10 @@ public class Task {
         if (this.status == TaskStatus.BLOCKED) {
             throw new IllegalArgumentException("Status da tarefa: BLOCKED.");
         }
-        if (this.owner == null) {
-            throw new IllegalArgumentException("Tarefa não possui owner.");
+        if (user == null) {
+            throw new IllegalArgumentException("Informe um usuário.");
         }
+        this.owner = user;
         this.status = TaskStatus.IN_PROGRESS;
         activeWorkload++;
         // TODO: Implementar lógica de proteção e atualizar activeWorkload
@@ -56,16 +66,21 @@ public class Task {
         if (this.status == TaskStatus.BLOCKED) {
             throw new IllegalArgumentException("Status da tarefa: BLOCKED.");
         }
+        if (this.status == TaskStatus.IN_PROGRESS) {
+            activeWorkload--;
+        }
         this.status = TaskStatus.DONE;
-        activeWorkload--;
         // TODO: Implementar lógica de proteção e atualizar activeWorkload (decrementar)
     }
 
     public void setBlocked(boolean blocked) {
+        if (this.status == TaskStatus.IN_PROGRESS) {
+            activeWorkload--;
+        }
         if (blocked) {
             this.status = TaskStatus.BLOCKED;
         } else {
-            this.status = TaskStatus.TO_DO; // Simplificação para o Lab
+            this.status = TaskStatus.TO_DO;
         }
     }
 
