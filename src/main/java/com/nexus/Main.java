@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.nexus.exception.NexusValidationException;
+import com.nexus.model.Project;
 import com.nexus.model.Task;
 import com.nexus.model.User;
 import com.nexus.service.LogProcessor;
@@ -104,11 +105,16 @@ public class Main {
     private static void addTask() {
         try {
             System.out.print("Título da Tarefa: ");
-            String title = scanner.nextLine();
+            String taskName = scanner.nextLine();
             System.out.print("Prazo (AAAA-MM-DD): ");
             LocalDate deadline = LocalDate.parse(scanner.nextLine());
+            System.out.print("Esforço estimado (em horas, número inteiro): ");
+            int effort = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Nome do projeto: ");
+            String projectName = scanner.nextLine();
 
-            Task newTask = new Task(title, deadline);
+            Task newTask = new Task(taskName, deadline, effort, projectName);
             workspace.addTask(newTask);
             System.out.println("[OK] Tarefa adicionada ao backlog.");
         } catch (DateTimeParseException e) {
@@ -136,12 +142,21 @@ public class Main {
         for (Task t : tasks) {
             System.out.printf("| %-2d | %-20s | %-11s | %-10s |%n",
                     t.getId(),
-                    truncar(t.getTitle(), 20),
+                    truncar(t.getTaskName(), 20),
                     t.getStatus(),
                     t.getDeadline());
         }
         System.out.println(header);
         System.out.println("Total de tarefas: " + Task.totalTasksCreated);
+    }
+
+    private static void listProjects() {
+        List<Project> projects = workspace.getProjects();
+
+        if (projects.isEmpty()) {
+            System.out.println("\n[!] Nenhuma tarefa no sistema.");
+            return;
+        }
     }
 
     /**

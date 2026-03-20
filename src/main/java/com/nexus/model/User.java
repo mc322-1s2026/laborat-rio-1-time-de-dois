@@ -20,15 +20,8 @@ public class User {
         this.email = email;
     }
 
-    public String consultEmail() {
-        return email;
-    }
-
-    public String consultUsername() {
-        return username;
-    }
-
-    public long calculateWorkload() {
-        return 0; 
-    }
+    // Getters
+    public String getEmail() { return email; }
+    public String getUsername() { return username; }
+    public long getWorkload() { return 0; } // IMPLEMENTAR!!
 }

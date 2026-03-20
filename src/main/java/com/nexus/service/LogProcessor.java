@@ -32,18 +32,26 @@ public class LogProcessor {
                             case "CREATE_USER" -> {
                                 User user = new User(p[1], p[2]);
                                 users.add(user);
-                                System.out.println("[LOG] Usuário criado: " + user.consultUsername());
+                                System.out.println("[LOG] Usuário criado: " + user.getUsername());
                             }
                             case "CREATE_PROJECT" -> {
-                                Project project = new Project
+                                Project project = new Project(p[1], Integer.parseInt(p[2]));
                             }
                             case "CREATE_TASK" -> {
-                                Task t = new Task(p[1], LocalDate.parse(p[2]), Integer.parseInt(p[3]));
+                                Task t = new Task(p[1], LocalDate.parse(p[2]), Integer.parseInt(p[3]), p[4]);
                                 workspace.addTask(t);
-                                System.out.println("[LOG] Tarefa criada: " + p[1]);
+                                System.out.println("[LOG] Tarefa criada: " + t.getTaskName());
                             }
                             case "ASSIGN_USER" -> {
-                                
+                                Task targetTask = Workspace.getInstance().getTasks().stream()
+                                    .filter(t -> t.getId() == Integer.parseInt(p[1]))
+                                    .findFirst()
+                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
+                                User targetUser = Workspace.getInstance().getUsers().stream()
+                                    .filter(u -> u.getUsername().equalsIgnoreCase(p[2].trim()))
+                                    .findFirst()
+                                    .orElseThrow(() -> new IllegalArgumentException("Usuário não cadastrado: " + p[2].trim()));
+                                targetTask.moveToInProgress(targetUser);
                             }
                             case "CHANGE_STATUS" -> {
                                 
