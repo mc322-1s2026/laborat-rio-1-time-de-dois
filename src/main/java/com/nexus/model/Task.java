@@ -17,10 +17,7 @@ public class Task {
     private TaskStatus status;
     private User owner;
     
-    public Task(String taskName, LocalDate deadline, int effort, String projectName) {
-        if (!Workspace.getInstance().projectNameExists(projectName)) {
-            throw new IllegalArgumentException("Nome do projeto não consta da lista de projetos.");
-        }
+    public Task(String taskName, LocalDate deadline, int effort) {
         if (taskName == null || taskName.isBlank()) {
             throw new IllegalArgumentException("Título não pode ser vazio.");
         }
@@ -42,7 +39,7 @@ public class Task {
      * Regra: Só é possível se houver um owner atribuído e não estiver BLOCKED.
      */
     public void moveToInProgress(User user) {
-        if (user == null || !Workspace.getInstance().userNameExists(user.getUsername())) {
+        if (user == null || !workspace.userNameExists(user.getUsername())) {
             throw new IllegalArgumentException("Informe um usuário válido.");
         }
         if (this.status == TaskStatus.BLOCKED) {

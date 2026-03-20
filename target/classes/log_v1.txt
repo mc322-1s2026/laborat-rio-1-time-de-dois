@@ -1,20 +1,6 @@
 CREATE_USER;nicolas.tesla;tesla@energy.com
 CREATE_USER;ada.lovelace;ada@calculus.gb
 CREATE_USER;alan.turing;alan@bletchley.org
-REPORT_STATUS
-CREATE_PROJECT;Novo Banco de Dados;100
-CREATE_PROJECT;Acesso de Novos Funcionarios;30
-CREATE_PROJECT;Atualizacao do App;70
-REPORT_STATUS
-CREATE_TASK;Configurar Banco de Dados;2026-03-05;7;Novo Banco de Dados
-CREATE_TASK;Implementar Autenticacao;2026-03-10;10;Acesso de Novos Funcionarios
-CREATE_TASK;Ajustar Layout Mobile;2026-03-15;20;Atualizacao do App
-REPORT_STATUS
-ASSIGN_USER;1;nicolas.tesla
-ASSIGN_USER;2;ada.lovelace
-ASSIGN_USER;3;alan.turing
-REPORT_STATUS
-CHANGE_STATUS;1;nicolas.tesla;BLOCKED
-CHANGE_STATUS;2;ada.lovelace;DONE
-CHANGE_STATUS;3;alan.turing;BLOCKED
-REPORT_STATUS
+CREATE_TASK;Configurar Banco de Dados;2026-03-05
+CREATE_TASK;Implementar Autenticacao;2026-03-10
+CREATE_TASK;Ajustar Layout Mobile;2026-03-15
