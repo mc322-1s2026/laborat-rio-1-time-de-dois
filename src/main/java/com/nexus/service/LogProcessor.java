@@ -45,11 +45,11 @@ public class LogProcessor {
                                 System.out.println("[LOG] Tarefa criada: " + t.getTaskName());
                             }
                             case "ASSIGN_USER" -> {
-                                Task targetTask = Workspace.getInstance().getTasks().stream()
+                                Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
-                                User targetUser = Workspace.getInstance().getUsers().stream()
+                                User targetUser = workspace.getUsers().stream()
                                     .filter(u -> u.getUsername().equalsIgnoreCase(p[2].trim()))
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Usuário não cadastrado: " + p[2].trim()));
