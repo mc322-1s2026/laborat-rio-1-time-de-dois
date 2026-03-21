@@ -83,4 +83,20 @@ public class Workspace {
             });
         System.out.println("--------------------------------------------------");
     } 
+
+    public void overloadedUsers(){
+        System.out.println("--------------------------------------------------");
+        System.out.println("  USUÁRIOS COM MAIS DE 10 TAREFAS EM PROGRESSO    ");
+        System.out.println("--------------------------------------------------");
+
+        tasks.stream()
+            .filter(task -> task.getStatus() == TaskStatus.IN_PROGRESS)
+            .collect(Collectors.groupingBy(Task::getOwner, Collectors.counting()))
+            .entrySet().stream()
+            .filter(entry -> entry.getValue() > 10)
+            .forEach(entry -> {
+                System.out.printf("Usuário: %-15s | Tarefas em progresso: %d\n",
+                    entry.getKey().getUsername(), entry.getValue());
+            });
+    }
 }
