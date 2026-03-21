@@ -39,7 +39,7 @@ public class Task {
      * Regra: Só é possível se houver um owner atribuído e não estiver BLOCKED.
      */
     public void moveToInProgress(User user) {
-        if (user == null || !workspace.userNameExists(user.getUsername())) {
+        if (user == null) {
             throw new IllegalArgumentException("Informe um usuário válido.");
         }
         if (this.status == TaskStatus.BLOCKED) {
@@ -56,7 +56,7 @@ public class Task {
      * Regra: Só pode ser movida para DONE se não estiver BLOCKED.
      */
     public void markAsDone(User user) {
-        if (user == null || !Workspace.getInstance().userNameExists(user.getUsername())) {
+        if (user == null) {
             throw new IllegalArgumentException("Informe um usuário válido.");
         }
         if (this.status == TaskStatus.BLOCKED) {
