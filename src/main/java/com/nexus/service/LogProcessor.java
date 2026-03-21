@@ -32,10 +32,12 @@ public class LogProcessor {
                             case "CREATE_USER" -> {
                                 User user = new User(p[1], p[2]);
                                 users.add(user);
+                                workspace.addUser(user);
                                 System.out.println("[LOG] Usuário criado: " + user.getUsername());
                             }
                             case "CREATE_PROJECT" -> {
                                 Project project = new Project(p[1], Integer.parseInt(p[2]));
+                                workspace.addProject(project);
                             }
                             case "CREATE_TASK" -> {
                                 Task t = new Task(p[1], LocalDate.parse(p[2]), Integer.parseInt(p[3]));
