@@ -60,16 +60,16 @@ public class LogProcessor {
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
-                                if (p[2].trim() == "IN_PROGRESS" && (targetTask.getStatus() == "TO_DO")) {
+                                if (p[2].trim() == "IN_PROGRESS" && (targetTask.getStatus() == TaskStatus.TO_DO)) {
                                     targetTask.moveToInProgress(targetTask.getOwner());
                                 }
-                                if (p[2].trim() == "DONE" && (targetTask.getStatus() == "TO_DO" || targetTask.getStatus() == "IN_PROGRESS")) {
+                                if (p[2].trim() == "DONE" && (targetTask.getStatus() == TaskStatus.TO_DO || targetTask.getStatus() == TaskStatus.IN_PROGRESS)) {
                                     targetTask.markAsDone(targetTask.getOwner());
                                 }
-                                if (p[2].trim() == "BLOCKED" && targetTask.getStatus() != "DONE") {
+                                if (p[2].trim() == "BLOCKED" && targetTask.getStatus() != TaskStatus.DONE) {
                                     targetTask.setBlocked(true);
                                 }
-                                if (p[2].trim() == "TO_DO" && targetTask.getStatus() == "BLOCKED") {
+                                if (p[2].trim() == "TO_DO" && targetTask.getStatus() == TaskStatus.BLOCKED) {
                                     targetTask.setBlocked(false);
                                 }
                                     
