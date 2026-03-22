@@ -32,21 +32,49 @@ public class LogProcessor {
                             case "CREATE_USER" -> {
                                 User user = new User(p[1], p[2]);
                                 users.add(user);
-                                System.out.println("[LOG] Usuário criado: " + user.consultUsername());
+                                workspace.addUser(user);
+                                System.out.println("[LOG] Usuário criado: " + user.getUsername());
                             }
                             case "CREATE_PROJECT" -> {
-
+                                Project project = new Project(p[1], Integer.parseInt(p[2]));
+                                workspace.addProject(project);
                             }
                             case "CREATE_TASK" -> {
                                 Task t = new Task(p[1], LocalDate.parse(p[2]), Integer.parseInt(p[3]));
                                 workspace.addTask(t);
-                                System.out.println("[LOG] Tarefa criada: " + p[1]);
+                                Project targetProject = workspace.findProject(p[4]);
+                                targetProject.addTask(t);
+                                System.out.println("[LOG] Tarefa criada: " + t.getTaskName());
                             }
                             case "ASSIGN_USER" -> {
-                                
+                                Task targetTask = workspace.getTasks().stream()
+                                    .filter(t -> t.getId() == Integer.parseInt(p[1]))
+                                    .findFirst()
+                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
+                                User targetUser = workspace.getUsers().stream()
+                                    .filter(u -> u.getUsername().equalsIgnoreCase(p[2].trim()))
+                                    .findFirst()
+                                    .orElseThrow(() -> new IllegalArgumentException("Usuário não cadastrado: " + p[2].trim()));
+                                targetTask.moveToInProgress(targetUser);
                             }
                             case "CHANGE_STATUS" -> {
-                                
+                                Task targetTask = workspace.getTasks().stream()
+                                    .filter(t -> t.getId() == Integer.parseInt(p[1]))
+                                    .findFirst()
+                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
+                                if (p[2].trim() == "IN_PROGRESS" && (targetTask.getStatus() == TaskStatus.TO_DO)) {
+                                    targetTask.moveToInProgress(targetTask.getOwner());
+                                }
+                                if (p[2].trim() == "DONE" && (targetTask.getStatus() == TaskStatus.TO_DO || targetTask.getStatus() == TaskStatus.IN_PROGRESS)) {
+                                    targetTask.markAsDone(targetTask.getOwner());
+                                }
+                                if (p[2].trim() == "BLOCKED" && targetTask.getStatus() != TaskStatus.DONE) {
+                                    targetTask.setBlocked(true);
+                                }
+                                if (p[2].trim() == "TO_DO" && targetTask.getStatus() == TaskStatus.BLOCKED) {
+                                    targetTask.setBlocked(false);
+                                }
+                                    
                             }
                             case "REPORT_STATUS" -> {
                                 
