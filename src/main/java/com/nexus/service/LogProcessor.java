@@ -56,23 +56,24 @@ public class LogProcessor {
                                     .filter(u -> u.getUsername().equalsIgnoreCase(p[2].trim()))
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Usuário não cadastrado: " + p[2].trim()));
-                                targetTask.moveToInProgress(targetUser);
+                                targetTask.setOwner(targetUser);
                             }
                             case "CHANGE_STATUS" -> {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
-                                if (p[2].trim() == "IN_PROGRESS" && (targetTask.getStatus() == TaskStatus.TO_DO)) {
+                               
+                                if (p[2].trim().equals("IN_PROGRESS") ) {
                                     targetTask.moveToInProgress(targetTask.getOwner());
                                 }
-                                if (p[2].trim() == "DONE" && (targetTask.getStatus() == TaskStatus.TO_DO || targetTask.getStatus() == TaskStatus.IN_PROGRESS)) {
+                                else if (p[2].trim().equals("DONE")) {
                                     targetTask.markAsDone(targetTask.getOwner());
                                 }
-                                if (p[2].trim() == "BLOCKED" && targetTask.getStatus() != TaskStatus.DONE) {
+                                else if (p[2].trim().equals("BLOCKED")) {
                                     targetTask.setBlocked(true);
                                 }
-                                if (p[2].trim() == "TO_DO" && targetTask.getStatus() == TaskStatus.BLOCKED) {
+                                else if (p[2].trim().equals("TO_DO")) {
                                     targetTask.setBlocked(false);
                                 }
                                     

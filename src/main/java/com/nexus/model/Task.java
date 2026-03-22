@@ -55,6 +55,10 @@ public class Task {
         activeWorkload++;
     }
 
+    public void setOwner(User user){
+        this.owner = user;
+    }
+
     /**
      * Finaliza a tarefa.
      * Regra: Só pode ser movida para DONE se não estiver BLOCKED.
