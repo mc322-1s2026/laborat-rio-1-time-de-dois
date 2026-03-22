@@ -1,5 +1,8 @@
 package com.nexus.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
     private final String username;
     private final String email;

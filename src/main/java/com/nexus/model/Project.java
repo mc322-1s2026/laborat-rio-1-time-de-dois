@@ -3,11 +3,11 @@ package com.nexus.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.nexus.service.Workspace; // CHECAR!!!
+import com.nexus.exception.NexusValidationException;
 
 public class Project {
-    private String projectName;
     private List<Task> taskList;
+    private String projectName;
     private int totalBudget;
 
     // Construtor que demanda nome do projeto e orçamento total
@@ -40,6 +40,12 @@ public class Project {
 
     // Getters
     public List<Task> getTaskList() { return List.copyOf(taskList); }
+    public long getTotalTasks() { return this.taskList.size(); }
     public String getProjectName() { return projectName; }
     public int getTotalBudget() { return totalBudget; }
+    public long getDoneTasksCount() {
+        return this.taskList.stream()
+               .filter(t -> t.getStatus() == TaskStatus.DONE)
+               .count();
+    }
 }

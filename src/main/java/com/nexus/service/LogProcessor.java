@@ -38,13 +38,14 @@ public class LogProcessor {
                             case "CREATE_PROJECT" -> {
                                 Project project = new Project(p[1], Integer.parseInt(p[2]));
                                 workspace.addProject(project);
+                                System.out.println("[LOG] Projeto criado: " + project.getProjectName());
                             }
                             case "CREATE_TASK" -> {
-                                Task t = new Task(p[1], LocalDate.parse(p[2]), Integer.parseInt(p[3]));
-                                workspace.addTask(t);
                                 Project targetProject = workspace.findProject(p[4]);
-                                targetProject.addTask(t);
-                                System.out.println("[LOG] Tarefa criada: " + t.getTaskName());
+                                Task targetTask = new Task(p[1], LocalDate.parse(p[2]), Integer.parseInt(p[3]));
+                                targetProject.addTask(targetTask);
+                                workspace.addTask(targetTask);
+                                System.out.println("[LOG] Tarefa criada: " + targetTask.getTaskName());
                             }
                             case "ASSIGN_USER" -> {
                                 Task targetTask = workspace.getTasks().stream()
@@ -77,7 +78,10 @@ public class LogProcessor {
                                     
                             }
                             case "REPORT_STATUS" -> {
-                                
+                                workspace.topPerformers();
+                                workspace.overloadedUsers();
+                                workspace.projectHealth();
+                                workspace.mostFrequentStatus();
                             }
                             default -> System.err.println("[WARN] Ação desconhecida: " + action);
                         }

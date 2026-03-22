@@ -1,6 +1,8 @@
 package com.nexus.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.nexus.service.Workspace;
 
@@ -28,6 +30,7 @@ public class Task {
         this.id = nextId++;
         this.deadline = deadline;
         this.taskName = taskName.trim();
+        this.projectName = projectName.trim();
         this.status = TaskStatus.TO_DO;        
         this.effort = effort;
 
@@ -66,7 +69,6 @@ public class Task {
             activeWorkload--;
         }
         this.status = TaskStatus.DONE;
-        // TODO: Implementar lógica de proteção e atualizar activeWorkload (decrementar)
     }
 
     public void setBlocked(boolean blocked) {

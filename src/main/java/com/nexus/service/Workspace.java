@@ -18,47 +18,36 @@ public class Workspace {
     private final List<Task> tasks = new ArrayList<>();
     private final List<User> users = new ArrayList<>();
 
-    public void addProject(Project project) {
-        projects.add(project);
-    }
-    public List<Project> getProjects() {
-        // Retorna uma visão não modificável para garantir encapsulamento
-        return Collections.unmodifiableList(projects);
-    }
+    public void addProject(Project project) { projects.add(project); }
+    public List<Project> getProjects() { return Collections.unmodifiableList(projects); }
 
-    public void addTask(Task task) {
-        tasks.add(task);
-    }
-    public List<Task> getTasks() {
-        // Retorna uma visão não modificável para garantir encapsulamento
-        return Collections.unmodifiableList(tasks);
-    }
+    public void addTask(Task task) { tasks.add(task); }
+    public List<Task> getTasks() { return Collections.unmodifiableList(tasks); }
 
-    public void addUser(User user) {
-        users.add(user);
-    }
-    public List<User> getUsers() {
-        // Retorna uma visão não modificável para garantir encapsulamento
-        return Collections.unmodifiableList(users);
-    }
+    public void addUser(User user) { users.add(user); }
+    public List<User> getUsers() { return Collections.unmodifiableList(users); }
     
-    // Métodos de checagem de existência de projetos, tarefas e usuários nas respectivas listas
-    public boolean projectNameExists(String name) {
-        return projects.stream()
-                .anyMatch(p -> p.getProjectName().equalsIgnoreCase(name.trim()));
-    }
-
+    // Método que procura e retorna projeto
     public Project findProject(String name) {
         return projects.stream()
                 .filter(p -> p.getProjectName().equalsIgnoreCase(name.trim()))
                 .findFirst()
-                .orElseThrow(() -> new NexusValidationException("Projeto não encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Projeto não encontrado."));
     }
+
+    // Método que diz se nome de projeto existe
+    public boolean projectNameExists(String name) {
+        return projects.stream()
+                .anyMatch(p -> p.getProjectName().equalsIgnoreCase(name.trim()));
+    }
+    
+    // Método que diz se nome da tarefa existe
     public boolean taskNameExists(String name) {
         return tasks.stream()
                 .anyMatch(u -> u.getTaskName().equalsIgnoreCase(name.trim()));
     }
 
+    // Método que diz se nome de usuário existe
     public boolean userNameExists(String name) {
         return users.stream()
                 .anyMatch(u -> u.getUsername().equalsIgnoreCase(name.trim()));
@@ -66,22 +55,28 @@ public class Workspace {
 
     // Relatórios de status
     public void topPerformers() {
-        System.out.println("--------------------------------------------------");
-        System.out.println("      USUÁRIOS COM MAIS TAREFAS CONCLUÍDAS        ");
-        System.out.println("--------------------------------------------------");
-        
-        tasks.stream()
+    System.out.println("--------------------------------------------------");
+    System.out.println("      USUÁRIOS COM MAIS TAREFAS CONCLUÍDAS        ");
+    System.out.println("--------------------------------------------------");
+
+    Map<User, Long> performaceMap = tasks.stream()
             .filter(t -> t.getStatus() == TaskStatus.DONE && t.getOwner() != null)
-            .collect(Collectors.groupingBy(Task::getOwner, Collectors.counting()))
-            .entrySet().stream()
-            .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-            .limit(3)
-            .forEach(entry -> {
-                System.out.printf("Usuário: %-15s | Concluídas: %d%n", 
-                              entry.getKey().getUsername(), 
-                              entry.getValue());
-            });
-        System.out.println("--------------------------------------------------");
+            .collect(Collectors.groupingBy(Task::getOwner, Collectors.counting()));
+
+    if (performaceMap.isEmpty()) {
+        System.out.println("Nenhuma tarefa concluída encontrada até o momento.");
+    } else {
+        // 3. Se houver dados, ordenamos, limitamos e imprimimos
+        performaceMap.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .limit(3)
+                .forEach(entry -> {
+                    System.out.printf("Usuário: %-15s | Concluídas: %d%n", 
+                                  entry.getKey().getUsername(), 
+                                  entry.getValue());
+                });
+    }
+    System.out.println("--------------------------------------------------");
     }
 
     public void overloadedUsers() {
@@ -89,18 +84,24 @@ public class Workspace {
     System.out.println("    USUÁRIOS COM SOBRECARGA (>10 EM ANDAMENTO)    ");
     System.out.println("--------------------------------------------------");
 
-    tasks.stream()
+    Map<User, Long> overloadMap = tasks.stream()
         .filter(t -> t.getStatus() == TaskStatus.IN_PROGRESS && t.getOwner() != null)
         .collect(Collectors.groupingBy(Task::getOwner, Collectors.counting()))
         .entrySet().stream()
         .filter(entry -> entry.getValue() > 10)
-        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-        .forEach(entry -> {
-            System.out.printf("Usuário: %-15s | Em andamento: %d%n", 
-                              entry.getKey().getUsername(), 
-                              entry.getValue());
-        });
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
+    if (overloadMap.isEmpty()) {
+        System.out.println("Não há usuários sobrecarregados no momento.");
+    } else {
+        overloadMap.entrySet().stream()
+            .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+            .forEach(entry -> {
+                System.out.printf("Usuário: %-15s | Em andamento: %d%n", 
+                                  entry.getKey().getUsername(), 
+                                  entry.getValue());
+            });
+    }
     System.out.println("--------------------------------------------------");
     }
 
@@ -109,24 +110,29 @@ public class Workspace {
     System.out.println("       PERCENTUAL DE CONCLUSÃO DOS PROJETOS       ");
     System.out.println("--------------------------------------------------");
 
-    projects.forEach(project -> {
-        long total = project.getTotalTasks();
-        double percentage = 0.0;
+    if (projects.isEmpty()) {
+        System.out.println("Não há projetos cadastrados no sistema.");
+    } else {
+        projects.forEach(project -> {
+            long total = project.getTotalTasks();
+            double percentage = 0.0;
 
-        if (total > 0) {
-            percentage = (project.getDoneTasksCount() * 100.0) / total;
-        }
-
-        System.out.printf("Projeto: %-20s | Progresso: [%3.0f%%] | Total: %d%n", 
-                          project.getProjectName(), 
-                          percentage, 
-                          total);
-    });
-
+            if (total > 0) {
+                percentage = (project.getDoneTasksCount() * 100.0) / total;
+                System.out.printf("Projeto: %-20s | Progresso: [%3.0f%%] | Total: %d%n", 
+                                  project.getProjectName(), 
+                                  percentage, 
+                                  total);
+            } else {
+                System.out.printf("Projeto: %-20s | [SEM TAREFAS LANÇADAS]%n", 
+                                  project.getProjectName());
+            }
+        });
+    }
     System.out.println("--------------------------------------------------");
     }
 
-    public void printMostFrequentStatus() {
+    public void mostFrequentStatus() {
     System.out.println("--------------------------------------------------");
     System.out.println(" STATUS COM MAIOR VOLUME DE TAREFAS (EXCETO DONE) ");
     System.out.println("--------------------------------------------------");
