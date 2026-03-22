@@ -42,7 +42,7 @@ public class LogProcessor {
                             }
                             case "CREATE_TASK" -> {
                                 Project targetProject = workspace.findProject(p[4]);
-                                Task targetTask = new Task(p[1], LocalDate.parse(p[2]), Integer.parseInt(p[3]));
+                                Task targetTask = new Task(p[1], LocalDate.parse(p[2]),Integer.parseInt(p[3]),targetProject.getProjectName());
                                 targetProject.addTask(targetTask);
                                 workspace.addTask(targetTask);
                                 System.out.println("[LOG] Tarefa criada: " + targetTask.getTaskName());

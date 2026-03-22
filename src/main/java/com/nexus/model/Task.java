@@ -16,10 +16,11 @@ public class Task {
     private int id;
     private LocalDate deadline; // Imutável após o nascimento
     private String taskName;
+    private String projectName;
     private TaskStatus status;
     private User owner;
     
-    public Task(String taskName, LocalDate deadline, int effort) {
+    public Task(String taskName, LocalDate deadline, int effort, String projectName) {
         if (taskName == null || taskName.isBlank()) {
             throw new IllegalArgumentException("Título não pode ser vazio.");
         }
