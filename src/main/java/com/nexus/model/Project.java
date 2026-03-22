@@ -33,7 +33,7 @@ public class Project {
                     .sum();
     int totalEffort = currentEffort + t.getEffort();
     if (totalEffort > totalBudget) {
-        throw new IllegalArgumentException("Orçamento total (em horas) do projeto foi excedido.");
+        throw new NexusValidationException("Orçamento total (em horas) do projeto foi excedido.");
     }
     taskList.add(t);
     }

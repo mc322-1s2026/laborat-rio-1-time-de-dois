@@ -51,7 +51,7 @@ public class LogProcessor {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
-                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
+                                    .orElseThrow(() -> new NexusValidationException("Task com ID " + p[1] + " não encontrada."));
                                 User targetUser = workspace.getUsers().stream()
                                     .filter(u -> u.getUsername().equalsIgnoreCase(p[2].trim()))
                                     .findFirst()
@@ -62,7 +62,7 @@ public class LogProcessor {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
-                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
+                                    .orElseThrow(() -> new NexusValidationException("Task com ID " + p[1] + " não encontrada."));
                                
                                 if (p[2].trim().equals("IN_PROGRESS") ) {
                                     targetTask.moveToInProgress(targetTask.getOwner());

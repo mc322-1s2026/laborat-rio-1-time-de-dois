@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nexus.exception.NexusValidationException;
 import com.nexus.service.Workspace;
 
 public class Task {
@@ -44,10 +45,10 @@ public class Task {
      */
     public void moveToInProgress(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("Informe um usuário válido.");
+            throw new NexusValidationException("Informe um usuário válido.");
         }
         if (this.status == TaskStatus.BLOCKED) {
-            throw new IllegalArgumentException("Status da tarefa: BLOCKED.");
+            throw new NexusValidationException("Status da tarefa: BLOCKED.");
         }
 
         this.owner = user;
@@ -65,10 +66,10 @@ public class Task {
      */
     public void markAsDone(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("Informe um usuário válido.");
+            throw new NexusValidationException("Informe um usuário válido.");
         }
         if (this.status == TaskStatus.BLOCKED) {
-            throw new IllegalArgumentException("Status da tarefa: BLOCKED.");
+            throw new NexusValidationException("Status da tarefa: BLOCKED.");
         }
         if (this.status == TaskStatus.IN_PROGRESS) {
             activeWorkload--;
