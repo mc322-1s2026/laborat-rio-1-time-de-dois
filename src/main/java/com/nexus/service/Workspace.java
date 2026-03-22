@@ -82,5 +82,66 @@ public class Workspace {
                               entry.getValue());
             });
         System.out.println("--------------------------------------------------");
-    } 
+    }
+
+    public void overloadedUsers() {
+    System.out.println("--------------------------------------------------");
+    System.out.println("    USUÁRIOS COM SOBRECARGA (>10 EM ANDAMENTO)    ");
+    System.out.println("--------------------------------------------------");
+
+    tasks.stream()
+        .filter(t -> t.getStatus() == TaskStatus.IN_PROGRESS && t.getOwner() != null)
+        .collect(Collectors.groupingBy(Task::getOwner, Collectors.counting()))
+        .entrySet().stream()
+        .filter(entry -> entry.getValue() > 10)
+        .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+        .forEach(entry -> {
+            System.out.printf("Usuário: %-15s | Em andamento: %d%n", 
+                              entry.getKey().getUsername(), 
+                              entry.getValue());
+        });
+
+    System.out.println("--------------------------------------------------");
+    }
+
+    public void projectHealth() {
+    System.out.println("--------------------------------------------------");
+    System.out.println("       PERCENTUAL DE CONCLUSÃO DOS PROJETOS       ");
+    System.out.println("--------------------------------------------------");
+
+    projects.forEach(project -> {
+        long total = project.getTotalTasks();
+        double percentage = 0.0;
+
+        if (total > 0) {
+            percentage = (project.getDoneTasksCount() * 100.0) / total;
+        }
+
+        System.out.printf("Projeto: %-20s | Progresso: [%3.0f%%] | Total: %d%n", 
+                          project.getProjectName(), 
+                          percentage, 
+                          total);
+    });
+
+    System.out.println("--------------------------------------------------");
+    }
+
+    public void printMostFrequentStatus() {
+    System.out.println("--------------------------------------------------");
+    System.out.println(" STATUS COM MAIOR VOLUME DE TAREFAS (EXCETO DONE) ");
+    System.out.println("--------------------------------------------------");
+
+    tasks.stream()
+        .filter(t -> t.getStatus() != TaskStatus.DONE)
+        .collect(Collectors.groupingBy(Task::getStatus, Collectors.counting()))
+        .entrySet().stream()
+        .max(Map.Entry.comparingByValue())
+        .ifPresentOrElse(
+            entry -> System.out.printf("Status Predominante: %s | Total: %d tarefas%n", 
+                                        entry.getKey(), entry.getValue()),
+            () -> System.out.println("Nenhuma tarefa encontrada.")
+        );
+
+    System.out.println("--------------------------------------------------");
+    }
 }
