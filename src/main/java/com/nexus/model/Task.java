@@ -82,7 +82,11 @@ public class Task {
             activeWorkload--;
         }
         if (blocked) {
-            this.status = TaskStatus.BLOCKED;
+            if(this.status != TaskStatus.DONE){
+                this.status = TaskStatus.BLOCKED;
+            }else{
+                throw new NexusValidationException("Operação não permitida: trocar de DONE para BLOCKED");
+            }
         } else {
             this.status = TaskStatus.TO_DO;
         }
