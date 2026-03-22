@@ -10,9 +10,9 @@ CREATE_TASK;Configurar Banco de Dados;2026-03-05;5;Novo Banco de Dados
 CREATE_TASK;Implementar Autenticacao;2026-03-10;6;Novos Funcionarios
 CREATE_TASK;Ajustar Layout Mobile;2026-03-15;10;Atualizacao do App
 REPORT_STATUS
-ASSIGN_USER;1;50;nicolas.tesla
-ASSIGN_USER;2;30;ada.lovelace
-ASSIGN_USER;3;100;alan.turing
+ASSIGN_USER;1;nicolas.tesla
+ASSIGN_USER;2;ada.lovelace
+ASSIGN_USER;3;alan.turing
 REPORT_STATUS
 CHANGE_STATUS;1;BLOCKED
 CHANGE_STATUS;2;DONE
