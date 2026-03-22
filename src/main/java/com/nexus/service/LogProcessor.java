@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class LogProcessor {
+    private int totalValidationErrors = 0;
 
     public void processLog(String fileName, Workspace workspace, List<User> users) {
         try {
@@ -88,6 +89,7 @@ public class LogProcessor {
                         }
                     } catch (NexusValidationException e) {
                         System.err.println("[ERRO DE REGRAS] Falha no comando '" + line + "': " + e.getMessage());
+                        totalValidationErrors++;
                     }
                 }
             }
