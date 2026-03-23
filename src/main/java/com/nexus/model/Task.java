@@ -1,11 +1,7 @@
 package com.nexus.model;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.nexus.exception.NexusValidationException;
-import com.nexus.service.Workspace;
 
 public class Task {
     // Métricas Globais (Alunos implementam a lógica de incremento/decremento)
@@ -44,16 +40,13 @@ public class Task {
      * Regra: Só é possível se houver um owner atribuído e não estiver BLOCKED.
      */
     public void moveToInProgress(User user) {
-        if (user == null) {
-            throw new NexusValidationException("Informe um usuário válido.");
-        }
-        if (this.status == TaskStatus.BLOCKED) {
-            throw new NexusValidationException("Status da tarefa: BLOCKED.");
-        }
+        if (user == null) { throw new IllegalArgumentException("Informe um usuário válido."); }
+        if (this.status == TaskStatus.BLOCKED) { throw new NexusValidationException("Status da tarefa: BLOCKED."); }
 
         this.owner = user;
         this.status = TaskStatus.IN_PROGRESS;
         activeWorkload++;
+        user.incrementWorkload();
     }
 
     public void setOwner(User user){
@@ -65,14 +58,11 @@ public class Task {
      * Regra: Só pode ser movida para DONE se não estiver BLOCKED.
      */
     public void markAsDone(User user) {
-        if (user == null) {
-            throw new NexusValidationException("Informe um usuário válido.");
-        }
-        if (this.status == TaskStatus.BLOCKED) {
-            throw new NexusValidationException("Status da tarefa: BLOCKED.");
-        }
+        if (user == null) { throw new IllegalArgumentException("Informe um usuário válido."); }
+        if (this.status == TaskStatus.BLOCKED) { throw new NexusValidationException("Status da tarefa: BLOCKED."); }
         if (this.status == TaskStatus.IN_PROGRESS) {
             activeWorkload--;
+            if (this.owner != null) { this.owner.decrementWorkload(); }
         }
         this.status = TaskStatus.DONE;
     }
@@ -80,6 +70,7 @@ public class Task {
     public void setBlocked(boolean blocked) {
         if (this.status == TaskStatus.IN_PROGRESS) {
             activeWorkload--;
+            if (this.owner != null) { this.owner.decrementWorkload(); }
         }
         if (blocked) {
             if(this.status != TaskStatus.DONE){
@@ -87,9 +78,7 @@ public class Task {
             }else{
                 throw new NexusValidationException("Operação não permitida: trocar de DONE para BLOCKED");
             }
-        } else {
-            this.status = TaskStatus.TO_DO;
-        }
+        } else { this.status = TaskStatus.TO_DO; }
     }
 
     // Getters
@@ -97,6 +86,7 @@ public class Task {
     public int getId() { return id; }
     public TaskStatus getStatus() { return status; }
     public String getTaskName() { return taskName; }
+    public String getProjectName() { return projectName; }
     public LocalDate getDeadline() { return deadline; }
     public User getOwner() { return owner; }
 }
