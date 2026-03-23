@@ -50,21 +50,21 @@ public class LogProcessor {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
-                                    .orElseThrow(() -> new NexusValidationException("Task com ID " + p[1] + " não encontrada."));
+                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
                                 User targetUser = workspace.getUsers().stream()
                                     .filter(u -> u.getUsername().equalsIgnoreCase(p[2].trim()))
                                     .findFirst()
-                                    .orElseThrow(() -> new NexusValidationException("Usuário não cadastrado: " + p[2].trim()));
+                                    .orElseThrow(() -> new IllegalArgumentException("Usuário não cadastrado: " + p[2].trim()));
                                 targetTask.setOwner(targetUser);
                             }
                             case "CHANGE_STATUS" -> {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
-                                    .orElseThrow(() -> new NexusValidationException("Task com ID " + p[1] + " não encontrada."));
+                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
                                
                                 if (targetTask.getOwner() == null) {
-                                    throw new NexusValidationException("Não é possível alterar status sem um dono atribuído.");
+                                    throw new NexusValidationException("Não é possível alterar status de tarefa sem um dono atribuído.");
                                 }
                                 switch (p[2].trim()) {
                                     case "IN_PROGRESS" -> targetTask.moveToInProgress(targetTask.getOwner());
