@@ -1,11 +1,9 @@
 package com.nexus.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class User {
     private final String username;
     private final String email;
+    private int currentWorkload = 0;
 
     public User(String username, String email) {
         if (username == null || username.isBlank()) {
@@ -23,8 +21,12 @@ public class User {
         this.email = email;
     }
 
+    // Métodos para incrementar e decrementar currentWorkload
+    public void incrementWorkload() { this.currentWorkload++; }
+    public void decrementWorkload() { this.currentWorkload--; }
+
     // Getters
+    public long getWorkload() { return currentWorkload; }
     public String getEmail() { return email; }
     public String getUsername() { return username; }
-    public long getWorkload() { return 0; } // IMPLEMENTAR!!
 }
