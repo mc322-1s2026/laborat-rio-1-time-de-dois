@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class LogProcessor {
+    private int totalValidationErrors = 0;
 
     public void processLog(String fileName, Workspace workspace, List<User> users) {
         try {
@@ -38,51 +39,57 @@ public class LogProcessor {
                             case "CREATE_PROJECT" -> {
                                 Project project = new Project(p[1], Integer.parseInt(p[2]));
                                 workspace.addProject(project);
+                                System.out.println("[LOG] Projeto criado: " + project.getProjectName());
                             }
                             case "CREATE_TASK" -> {
-                                Task t = new Task(p[1], LocalDate.parse(p[2]), Integer.parseInt(p[3]));
-                                workspace.addTask(t);
                                 Project targetProject = workspace.findProject(p[4]);
-                                targetProject.addTask(t);
-                                System.out.println("[LOG] Tarefa criada: " + t.getTaskName());
+                                Task targetTask = new Task(p[1], LocalDate.parse(p[2]),Integer.parseInt(p[3]),targetProject.getProjectName());
+                                targetProject.addTask(targetTask);
+                                workspace.addTask(targetTask);
+                                System.out.println("[LOG] Tarefa criada: " + targetTask.getTaskName());
                             }
                             case "ASSIGN_USER" -> {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
-                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
+                                    .orElseThrow(() -> new NexusValidationException("Task com ID " + p[1] + " não encontrada."));
                                 User targetUser = workspace.getUsers().stream()
                                     .filter(u -> u.getUsername().equalsIgnoreCase(p[2].trim()))
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Usuário não cadastrado: " + p[2].trim()));
-                                targetTask.moveToInProgress(targetUser);
+                                targetTask.setOwner(targetUser);
                             }
                             case "CHANGE_STATUS" -> {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
-                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
-                                if (p[2].trim() == "IN_PROGRESS" && (targetTask.getStatus() == TaskStatus.TO_DO)) {
+                                    .orElseThrow(() -> new NexusValidationException("Task com ID " + p[1] + " não encontrada."));
+                               
+                                if (p[2].trim().equals("IN_PROGRESS") ) {
                                     targetTask.moveToInProgress(targetTask.getOwner());
                                 }
-                                if (p[2].trim() == "DONE" && (targetTask.getStatus() == TaskStatus.TO_DO || targetTask.getStatus() == TaskStatus.IN_PROGRESS)) {
+                                else if (p[2].trim().equals("DONE")) {
                                     targetTask.markAsDone(targetTask.getOwner());
                                 }
-                                if (p[2].trim() == "BLOCKED" && targetTask.getStatus() != TaskStatus.DONE) {
+                                else if (p[2].trim().equals("BLOCKED")) {
                                     targetTask.setBlocked(true);
                                 }
-                                if (p[2].trim() == "TO_DO" && targetTask.getStatus() == TaskStatus.BLOCKED) {
+                                else if (p[2].trim().equals("TO_DO")) {
                                     targetTask.setBlocked(false);
                                 }
                                     
                             }
                             case "REPORT_STATUS" -> {
-                                
+                                workspace.topPerformers();
+                                workspace.overloadedUsers();
+                                workspace.projectHealth();
+                                workspace.mostFrequentStatus();
                             }
                             default -> System.err.println("[WARN] Ação desconhecida: " + action);
                         }
                     } catch (NexusValidationException e) {
                         System.err.println("[ERRO DE REGRAS] Falha no comando '" + line + "': " + e.getMessage());
+                        totalValidationErrors++;
                     }
                 }
             }

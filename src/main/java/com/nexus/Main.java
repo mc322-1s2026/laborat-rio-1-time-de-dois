@@ -114,7 +114,7 @@ public class Main {
             System.out.print("Nome do projeto: ");
             String projectName = scanner.nextLine();
 
-            Task newTask = new Task(taskName, deadline, effort);
+            Task newTask = new Task(taskName, deadline, effort, projectName);
             workspace.addTask(newTask);
             System.out.println("[OK] Tarefa adicionada ao backlog.");
         } catch (DateTimeParseException e) {

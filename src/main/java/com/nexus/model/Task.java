@@ -1,7 +1,10 @@
 package com.nexus.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.nexus.exception.NexusValidationException;
 import com.nexus.service.Workspace;
 
 public class Task {
@@ -14,10 +17,11 @@ public class Task {
     private int id;
     private LocalDate deadline; // Imutável após o nascimento
     private String taskName;
+    private String projectName;
     private TaskStatus status;
     private User owner;
     
-    public Task(String taskName, LocalDate deadline, int effort) {
+    public Task(String taskName, LocalDate deadline, int effort, String projectName) {
         if (taskName == null || taskName.isBlank()) {
             throw new IllegalArgumentException("Título não pode ser vazio.");
         }
@@ -28,6 +32,7 @@ public class Task {
         this.id = nextId++;
         this.deadline = deadline;
         this.taskName = taskName.trim();
+        this.projectName = projectName.trim();
         this.status = TaskStatus.TO_DO;        
         this.effort = effort;
 
@@ -40,15 +45,19 @@ public class Task {
      */
     public void moveToInProgress(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("Informe um usuário válido.");
+            throw new NexusValidationException("Informe um usuário válido.");
         }
         if (this.status == TaskStatus.BLOCKED) {
-            throw new IllegalArgumentException("Status da tarefa: BLOCKED.");
+            throw new NexusValidationException("Status da tarefa: BLOCKED.");
         }
 
         this.owner = user;
         this.status = TaskStatus.IN_PROGRESS;
         activeWorkload++;
+    }
+
+    public void setOwner(User user){
+        this.owner = user;
     }
 
     /**
@@ -57,16 +66,15 @@ public class Task {
      */
     public void markAsDone(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("Informe um usuário válido.");
+            throw new NexusValidationException("Informe um usuário válido.");
         }
         if (this.status == TaskStatus.BLOCKED) {
-            throw new IllegalArgumentException("Status da tarefa: BLOCKED.");
+            throw new NexusValidationException("Status da tarefa: BLOCKED.");
         }
         if (this.status == TaskStatus.IN_PROGRESS) {
             activeWorkload--;
         }
         this.status = TaskStatus.DONE;
-        // TODO: Implementar lógica de proteção e atualizar activeWorkload (decrementar)
     }
 
     public void setBlocked(boolean blocked) {
@@ -74,7 +82,11 @@ public class Task {
             activeWorkload--;
         }
         if (blocked) {
-            this.status = TaskStatus.BLOCKED;
+            if(this.status != TaskStatus.DONE){
+                this.status = TaskStatus.BLOCKED;
+            }else{
+                throw new NexusValidationException("Operação não permitida: trocar de DONE para BLOCKED");
+            }
         } else {
             this.status = TaskStatus.TO_DO;
         }
