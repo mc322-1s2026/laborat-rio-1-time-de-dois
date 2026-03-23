@@ -26,7 +26,7 @@ public class Project {
     // Adiciona tarefas no projeto até o limite do orçamento de horas
     public void addTask(Task t) {
     if (t == null) {
-        throw new IllegalArgumentException("Tarefa não encontrada.");
+        throw new IllegalArgumentException("Tarefa não pode ser nula.");
     }
     int currentEffort = taskList.stream()
                     .mapToInt(Task::getEffort)
