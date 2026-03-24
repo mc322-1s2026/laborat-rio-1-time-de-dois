@@ -29,10 +29,11 @@ public class Workspace {
     
     // Método que procura e retorna projeto
     public Project findProject(String name) {
+        if (name == null) { throw new IllegalArgumentException("Nome do projeto não pode ser nulo."); }
         return projects.stream()
                 .filter(p -> p.getProjectName().equalsIgnoreCase(name.trim()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Projeto não encontrado."));
+                .orElseThrow(() -> new NexusValidationException("Projeto não encontrado."));
     }
 
     // Método que diz se nome de projeto existe
@@ -84,23 +85,17 @@ public class Workspace {
     System.out.println("    USUÁRIOS COM SOBRECARGA (>10 EM ANDAMENTO)    ");
     System.out.println("--------------------------------------------------");
 
-    Map<User, Long> overloadMap = tasks.stream()
-        .filter(t -> t.getStatus() == TaskStatus.IN_PROGRESS && t.getOwner() != null)
-        .collect(Collectors.groupingBy(Task::getOwner, Collectors.counting()))
-        .entrySet().stream()
-        .filter(entry -> entry.getValue() > 10)
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    List<User> overloaded = users.stream()
+            .filter(u -> u.getWorkload() > 10)
+            .sorted(Comparator.comparingLong(User::getWorkload).reversed())
+            .toList();
 
-    if (overloadMap.isEmpty()) {
+    if (overloaded.isEmpty()) {
         System.out.println("Não há usuários sobrecarregados no momento.");
     } else {
-        overloadMap.entrySet().stream()
-            .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-            .forEach(entry -> {
-                System.out.printf("Usuário: %-15s | Em andamento: %d%n", 
-                                  entry.getKey().getUsername(), 
-                                  entry.getValue());
-            });
+        overloaded.forEach(u -> 
+            System.out.printf("Usuário: %-15s | Em andamento: %d%n", u.getUsername(), u.getWorkload())
+        );
     }
     System.out.println("--------------------------------------------------");
     }

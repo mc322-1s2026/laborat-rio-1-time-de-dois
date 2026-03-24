@@ -7,8 +7,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class LogProcessor {
-    private int totalValidationErrors = 0;
-
     public void processLog(String fileName, Workspace workspace, List<User> users) {
         try {
             // Busca o arquivo dentro da pasta de recursos do projeto (target/classes)
@@ -52,32 +50,30 @@ public class LogProcessor {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
-                                    .orElseThrow(() -> new NexusValidationException("Task com ID " + p[1] + " não encontrada."));
+                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
                                 User targetUser = workspace.getUsers().stream()
                                     .filter(u -> u.getUsername().equalsIgnoreCase(p[2].trim()))
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Usuário não cadastrado: " + p[2].trim()));
                                 targetTask.setOwner(targetUser);
+                                System.out.println("[LOG] Usuário "+ targetTask.getOwner() +" atribuído à tarefa " + targetTask.getTaskName());
                             }
                             case "CHANGE_STATUS" -> {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
-                                    .orElseThrow(() -> new NexusValidationException("Task com ID " + p[1] + " não encontrada."));
-                               
-                                if (p[2].trim().equals("IN_PROGRESS") ) {
-                                    targetTask.moveToInProgress(targetTask.getOwner());
+                                    .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
+                                if (targetTask.getOwner() == null) {
+                                    throw new NexusValidationException("Não é possível alterar status de tarefa sem um dono atribuído.");
                                 }
-                                else if (p[2].trim().equals("DONE")) {
-                                    targetTask.markAsDone(targetTask.getOwner());
+                                switch (p[2].trim()) {
+                                    case "IN_PROGRESS" -> targetTask.moveToInProgress(targetTask.getOwner());
+                                    case "DONE"        -> targetTask.markAsDone(targetTask.getOwner());
+                                    case "BLOCKED"     -> targetTask.setBlocked(true);
+                                    case "TO_DO"       -> targetTask.setBlocked(false);
+                                    default -> throw new NexusValidationException("Status desconhecido: " + p[2].trim());
                                 }
-                                else if (p[2].trim().equals("BLOCKED")) {
-                                    targetTask.setBlocked(true);
-                                }
-                                else if (p[2].trim().equals("TO_DO")) {
-                                    targetTask.setBlocked(false);
-                                }
-                                    
+                                System.out.println("[LOG] Status da tarefa " + targetTask.getId() + " alterado para: " + targetTask.getStatus());       
                             }
                             case "REPORT_STATUS" -> {
                                 workspace.topPerformers();
@@ -89,7 +85,6 @@ public class LogProcessor {
                         }
                     } catch (NexusValidationException e) {
                         System.err.println("[ERRO DE REGRAS] Falha no comando '" + line + "': " + e.getMessage());
-                        totalValidationErrors++;
                     }
                 }
             }
