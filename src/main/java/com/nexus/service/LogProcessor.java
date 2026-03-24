@@ -56,13 +56,13 @@ public class LogProcessor {
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Usuário não cadastrado: " + p[2].trim()));
                                 targetTask.setOwner(targetUser);
+                                System.out.println("[LOG] Usuário "+ targetTask.getOwner() +" atribuído à tarefa " + targetTask.getTaskName());
                             }
                             case "CHANGE_STATUS" -> {
                                 Task targetTask = workspace.getTasks().stream()
                                     .filter(t -> t.getId() == Integer.parseInt(p[1]))
                                     .findFirst()
                                     .orElseThrow(() -> new IllegalArgumentException("Task com ID " + p[1] + " não encontrada."));
-                               
                                 if (targetTask.getOwner() == null) {
                                     throw new NexusValidationException("Não é possível alterar status de tarefa sem um dono atribuído.");
                                 }
@@ -72,7 +72,8 @@ public class LogProcessor {
                                     case "BLOCKED"     -> targetTask.setBlocked(true);
                                     case "TO_DO"       -> targetTask.setBlocked(false);
                                     default -> throw new NexusValidationException("Status desconhecido: " + p[2].trim());
-                                }       
+                                }
+                                System.out.println("[LOG] Status da tarefa " + targetTask.getId() + " alterado para: " + targetTask.getStatus());       
                             }
                             case "REPORT_STATUS" -> {
                                 workspace.topPerformers();
